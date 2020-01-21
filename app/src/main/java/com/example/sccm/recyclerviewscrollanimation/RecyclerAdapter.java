@@ -23,6 +23,8 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.Recycl
     List<RecyclerModel> mRecyclerModels;
     private Context mContext;
 
+    int previousPosition = 0;
+
     public RecyclerAdapter(List<RecyclerModel> recyclerModels, Context context) {
         mRecyclerModels = recyclerModels;
         mContext = context;
@@ -44,7 +46,18 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.Recycl
         holder.imageView.setAnimation(AnimationUtils.loadAnimation(mContext,R.anim.fade_transititon));
         holder.container.setAnimation(AnimationUtils.loadAnimation(mContext,R.anim.fade_scale_animation));
 
-        runEnterAnimation(holder.itemView);
+        /*if (position > lastPosition)
+        {
+
+        }else {
+
+        }
+
+
+        previousPosition = position;
+        */
+
+        //runEnterAnimation(holder.itemView);
 
 
         holder.imageView.setImageResource(mRecyclerModels.get(position).image);

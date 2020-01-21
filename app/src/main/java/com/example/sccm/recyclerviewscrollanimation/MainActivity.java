@@ -5,6 +5,8 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 
 import java.util.ArrayList;
 
@@ -13,7 +15,9 @@ public class MainActivity extends AppCompatActivity {
     RecyclerView recycler_view;
 
     RecyclerAdapter mRecyclerAdapter;
-
+    final int duration = 10;
+    final int pixelsToMove = 30;
+    private final Handler mHandler = new Handler(Looper.getMainLooper());
     private String headline[] = {
             "This is Headline",
             "This is Headline",
@@ -84,6 +88,8 @@ public class MainActivity extends AppCompatActivity {
 
     };
 
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -92,11 +98,43 @@ public class MainActivity extends AppCompatActivity {
         recycler_view = findViewById(R.id.recycler_view);
 
         ArrayList<RecyclerModel> recyclerModels = prepareData();
-        recycler_view.setLayoutManager(new LinearLayoutManager(this));
+        final LinearLayoutManager layoutManager = new LinearLayoutManager(this,LinearLayoutManager.HORIZONTAL,false);
+        recycler_view.setLayoutManager(layoutManager);
+        //recycler_view.setLayoutManager(new LinearLayoutManager(this));
         recycler_view.setHasFixedSize(true);
         mRecyclerAdapter = new RecyclerAdapter(recyclerModels,this);
         recycler_view.setAdapter(mRecyclerAdapter);
+
+        recycler_view.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+                super.onScrolled(recyclerView, dx, dy);
+                int lastItem = layoutManager.findLastCompletelyVisibleItemPosition();
+                if(lastItem == layoutManager.getItemCount()-1){
+                    mHandler.removeCallbacks(SCROLLING_RUNNABLE);
+                    Handler postHandler = new Handler();
+                    postHandler.postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            recycler_view.setAdapter(null);
+                            recycler_view.setAdapter(mRecyclerAdapter);
+                            mHandler.postDelayed(SCROLLING_RUNNABLE, 500);
+                        }
+                    }, 500);
+                }
+            }
+        });
+        mHandler.postDelayed(SCROLLING_RUNNABLE, 2000);
     }
+
+    private final Runnable SCROLLING_RUNNABLE = new Runnable() {
+
+        @Override
+        public void run() {
+            recycler_view.smoothScrollBy(pixelsToMove, 0);
+            mHandler.postDelayed(this, duration);
+        }
+    };
 
     private ArrayList<RecyclerModel> prepareData() {
 
